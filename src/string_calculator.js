@@ -1,59 +1,43 @@
-function Add (str){
+function add(str) {
+    var numbers = [];
+    var expression = str.slice(str.search("\n") + 1, str.length);
+    var delimeter = "";
+    if (str == "") {
+        return (0);
 
-  let sum = 0;
-  let regularExp = new RegExp(/-?\d+/g);
-  let arr = str.match(regularExp);
-  let negatives = [];
+    }
+    if (str.length == 1) {
+        return (parseInt(str));
+    }
+    if (str.match(/\[(.*?)\]/g) && str.match("//") && !isNaN(parseInt(str[str.length - 1]))) {
+        delimeter = str.match(/\[(.*?)\]/g)
+        for (var i = 0; i < delimeter.length; i++) {
+            expression = expression.split(delimeter[i].slice(1, -1)).join()
+        }
+        numbers = expression.split(",")
 
-  if (str == ""){
+    } else if (str.slice(0, 2).match("//") && !isNaN(parseInt(str[str.length - 1]))) {
 
-      return 0;
-  }
+        delimeter = str.slice(2, str.search("\n"));
+        numbers = expression.split(delimeter);
 
-  for(let i = 0; i < arr.length; i++){
+    } else if (str.match(/[\n]/) && /\d/.test(str[str.length - 1]) &&
+        /\d/.test(str[0]) && str.match(/[\/]/g) == null) {
+        numbers = str.split("\n").toString();
+        numbers = numbers.split(",");
 
-      if (arr[i] < 0){
+    } else if (/^[\d,-\d]*$/.test(str)) {
+        numbers = str.split(",");
 
-          negatives.push(arr[i]);
-      } 
-      else {
-          if(parseInt(arr[i]) > 1000){
-              continue;
-              
-          } else {
-              sum += parseInt(arr[i]);
-          }
-      }
-  }
+    } else { throw Error("invalid input") }
+    if (numbers.toString().match(/-\d/)) {
+        throw Error("negatives not allowed " + numbers.toString().match(/-\d/g));
+    }
 
-  if(negatives.length > 0){
-
-      let negNumbers = " ";
-
-      for(var i = 0; i < negatives.length; i++){
-
-          if(i == negatives.length  - 1){
-      
-              negNumbers += negatives[i];
-              
-          }
-
-          else{
-              negNumbers += negatives[i] + ",";
-          } 
-      }
-      throw("negatives not allowed " + negNumbers);
-      
-  }  
-  
-  return sum;
+    return (numbers.filter(function ignore(num) {
+        return num < 1000;
+    }).reduce((sum, current) => parseInt(sum) + parseInt(current)));
 }
 
 
-
-module.exports = { Add};
-
-
-
-
-
+module.exports = (add)
